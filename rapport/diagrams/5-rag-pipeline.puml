@@ -1,0 +1,58 @@
+@startuml rag-pipeline
+' Pipeline RAG — ingestion et interrogation
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam defaultFontName SansSerif
+skinparam dpi 150
+skinparam rectangle {
+  BackgroundColor #F4F4F4
+  BorderColor #333333
+}
+skinparam database {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+skinparam cloud {
+  BackgroundColor #EAEAEA
+  BorderColor #222222
+}
+title Pipeline RAG — ingestion (hors ligne) et interrogation (en ligne)
+
+rectangle "Base de connaissances\n(13 documents Markdown FR :\nRH, missions, finance,\nprocedures, organisation)" as KB
+
+package "Ingestion  (POST /rag/reindex)" {
+  rectangle "1. Parsing\n(Apache Tika / texte)\n+ extraction titre & reference" as PARSE
+  rectangle "2. Decoupage en chunks\n(recursif : 3600 car.,\nchevauchement 650)" as CHUNK
+  rectangle "3. Vectorisation\n(bge-m3, 1024 dim.)" as EMBED
+}
+
+database "PostgreSQL + pgvector\ntable regulation_embeddings\n(index ivfflat, cosinus)" as STORE
+
+package "Interrogation  (en ligne)" {
+  rectangle "Question / Demande" as Q
+  rectangle "4. Vectorisation\nde la requete (bge-m3)" as QEMBED
+  rectangle "5. Recherche semantique\n(top-k = 5..6, score min. 0.5)" as SEARCH
+  rectangle "6. Generation ancree\n(LLM Qwen3 + extraits)\n+ citations" as GEN
+}
+
+cloud "Ollama\nbge-m3" as OLLAMA
+cloud "OpenRouter\nQwen3" as LLM
+
+KB --> PARSE
+PARSE --> CHUNK
+CHUNK --> EMBED
+EMBED ..> OLLAMA
+EMBED --> STORE : addAll(embeddings, segments)
+
+Q --> QEMBED
+QEMBED ..> OLLAMA
+QEMBED --> SEARCH
+SEARCH --> STORE : EmbeddingSearchRequest
+STORE --> SEARCH : extraits + metadonnees
+SEARCH --> GEN
+GEN ..> LLM
+GEN --> Q : reponse + citations (docRef, titre, score)
+
+@enduml

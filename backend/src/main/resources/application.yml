@@ -1,0 +1,94 @@
+# =============================================================================
+# AdminAI backend — base configuration.
+# Profile-specific overrides live in application-<profile>.yml.
+# All secrets/URLs are injected via environment variables (see .env).
+# =============================================================================
+spring:
+  application:
+    name: adminai-backend
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/adminai}
+    username: ${SPRING_DATASOURCE_USERNAME:adminai}
+    password: ${SPRING_DATASOURCE_PASSWORD:adminai_dev_pwd}
+    hikari:
+      pool-name: adminai-pool
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway owns the schema; Hibernate only validates.
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE_MB:25}MB
+      max-request-size: ${MAX_FILE_SIZE_MB:25}MB
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# --- Application-specific properties (bound in typed @ConfigurationProperties) ---
+adminai:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:ZGV2LW9ubHktc2VjcmV0LWNoYW5nZS1tZS1pbi1wcm9kdWN0aW9uLTEyMzQ1Njc4OTA}
+      access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:3600000}
+      refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+      issuer: adminai
+  llm:
+    base-url: ${LLM_BASE_URL:https://openrouter.ai/api/v1}
+    api-key: ${LLM_API_KEY:}
+    model: ${LLM_MODEL:qwen/qwen3-30b-a3b}
+    temperature: ${LLM_TEMPERATURE:0.2}
+    max-tokens: ${LLM_MAX_TOKENS:2048}
+  embedding:
+    base-url: ${EMBEDDING_BASE_URL:http://localhost:11434}
+    model: ${EMBEDDING_MODEL:bge-m3}
+    dimension: ${EMBEDDING_DIMENSION:1024}
+  storage:
+    path: ${FILE_STORAGE_PATH:./storage}
+  rag:
+    knowledge-base-path: ${RAG_KNOWLEDGE_BASE_PATH:./knowledge-base}
+    embedding-table: ${RAG_EMBEDDING_TABLE:regulation_embeddings}
+    chunk-size-chars: ${RAG_CHUNK_SIZE_CHARS:3600}
+    chunk-overlap-chars: ${RAG_CHUNK_OVERLAP_CHARS:650}
+    top-k: ${RAG_TOP_K:5}
+    min-score: ${RAG_MIN_SCORE:0.5}
+
+# --- Actuator (health checks used by Docker) ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.pfe.adminagent: INFO
+    org.springframework.security: WARN

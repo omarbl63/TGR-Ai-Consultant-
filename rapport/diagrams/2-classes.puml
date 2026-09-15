@@ -1,0 +1,224 @@
+@startuml classes
+' Diagramme de classes — Modèle du domaine AdminAI
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #222222
+  ArrowColor #555555
+  HeaderBackgroundColor #F4F4F4
+}
+skinparam enum {
+  BackgroundColor #ECECEC
+  BorderColor #555555
+}
+hide circle
+title Diagramme de classes — Agent Administratif IA
+
+class Utilisateur {
+  - id : UUID
+  - email : String
+  - nomComplet : String
+  - motDePasseHash : String
+  - departement : String
+  - fonction : String
+  - actif : boolean
+  - creeLe : Date
+}
+
+class SoldeConge {
+  - id : UUID
+  - annee : int
+  - joursAcquis : double
+  - joursPris : double
+  + joursRestants() : double
+}
+
+class Conversation {
+  - id : UUID
+  - titre : String
+  - creeLe : Date
+  - misAJourLe : Date
+}
+
+class Message {
+  - id : UUID
+  - contenu : String
+  - metadonnees : JSON
+  - creeLe : Date
+}
+
+class DemandeAdministrative {
+  - id : UUID
+  - reference : String
+  - titre : String
+  - donneesStructurees : JSON
+  - soumiseLe : Date
+  - decideeLe : Date
+  - creeLe : Date
+  + soumettre()
+  + decider(statut, approbateur)
+}
+
+class AnalyseIA {
+  - id : UUID
+  - resume : String
+  - scoreConfiance : double
+  - scoreRisque : double
+  - raisonnement : String
+  - infosManquantes : List<String>
+  - piecesManquantes : List<String>
+  - anomalies : List<String>
+  - modele : String
+  - creeLe : Date
+}
+
+class Citation {
+  - id : UUID
+  - refDocument : String
+  - titre : String
+  - source : String
+  - score : double
+  - extrait : String
+}
+
+class EvenementDemande {
+  - id : UUID
+  - acteurId : UUID
+  - commentaire : String
+  - creeLe : Date
+}
+
+class PieceJointe {
+  - id : UUID
+  - nomFichier : String
+  - typeContenu : String
+  - taille : long
+  - cheminStockage : String
+}
+
+class Notification {
+  - id : UUID
+  - titre : String
+  - message : String
+  - lue : boolean
+  - creeLe : Date
+}
+
+class JournalAudit {
+  - id : UUID
+  - action : String
+  - typeEntite : String
+  - idEntite : String
+  - details : JSON
+  - creeLe : Date
+}
+
+class DocumentReglementaire {
+  - id : UUID
+  - nomFichier : String
+  - titre : String
+  - refDocument : String
+  - categorie : String
+  - nbChunks : int
+  - checksum : String
+  - creeLe : Date
+}
+
+' ---- Couche IA (architecture) ----
+class OrchestrateurIA <<service>> {
+  + traiterMessage(utilisateur, message) : ReponseChat
+  + analyserDemande(demande) : AnalyseIA
+}
+class ServiceLLM <<service>> {
+  + detecterIntention(conv) : Intention
+  + extraireInformations(conv) : Map
+  + analyserConformite(demande, extraits) : AnalyseIA
+  + repondre(question, extraits) : String
+}
+class ServiceRAG <<service>> {
+  + indexer(document)
+  + rechercher(requete, k) : List<Citation>
+}
+
+' ---- Énumérations ----
+enum Role {
+  EMPLOYE
+  RESPONSABLE
+  DIRECTEUR
+  ADMINISTRATEUR
+}
+enum TypeDemande {
+  CONGE
+  ORDRE_MISSION
+  REMBOURSEMENT_FRAIS
+}
+enum StatutDemande {
+  BROUILLON
+  SOUMISE
+  EN_EXAMEN
+  APPROUVEE
+  REJETEE
+  MODIFICATIONS_DEMANDEES
+}
+enum Recommandation {
+  APPROUVER
+  REJETER
+  DEMANDER_MODIFICATIONS
+}
+enum StatutConformite {
+  CONFORME
+  CONFORME_AVEC_RESERVE
+  INCOMPLETE
+  NON_CONFORME
+}
+enum NiveauRisque {
+  FAIBLE
+  MOYEN
+  ELEVE
+}
+enum RoleMessage {
+  UTILISATEUR
+  ASSISTANT
+  SYSTEME
+}
+enum TypeEvenement {
+  CREEE
+  SOUMISE
+  ANALYSEE_IA
+  APPROUVEE
+  REJETEE
+  COMMENTEE
+}
+
+' ---- Associations ----
+Utilisateur "1" -- "*" DemandeAdministrative : dépose >
+Utilisateur "1" -- "*" SoldeConge : possède >
+Utilisateur "1" -- "*" Conversation : mène >
+Utilisateur "1" -- "*" Notification : reçoit >
+Conversation "1" *-- "*" Message : contient >
+DemandeAdministrative "1" o-- "0..1" AnalyseIA : évaluée par >
+AnalyseIA "1" *-- "*" Citation : s'appuie sur >
+DemandeAdministrative "1" *-- "*" EvenementDemande : historise >
+DemandeAdministrative "1" *-- "*" PieceJointe : joint >
+DemandeAdministrative "0..1" -- "1" Conversation : issue de >
+
+Utilisateur ..> Role
+DemandeAdministrative ..> TypeDemande
+DemandeAdministrative ..> StatutDemande
+AnalyseIA ..> Recommandation
+AnalyseIA ..> StatutConformite
+AnalyseIA ..> NiveauRisque
+Message ..> RoleMessage
+EvenementDemande ..> TypeEvenement
+
+OrchestrateurIA ..> ServiceLLM : utilise >
+OrchestrateurIA ..> ServiceRAG : utilise >
+OrchestrateurIA ..> DemandeAdministrative : crée >
+OrchestrateurIA ..> AnalyseIA : produit >
+ServiceRAG ..> DocumentReglementaire : indexe >
+ServiceRAG ..> Citation : retourne >
+
+@enduml

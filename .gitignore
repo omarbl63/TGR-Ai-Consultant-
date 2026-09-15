@@ -1,0 +1,39 @@
+# Secrets & env
+.env
+*.local
+
+# Java / Maven
+backend/target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node / Angular / Expo
+node_modules/
+dashboard/dist/
+dashboard/.angular/
+mobile/.expo/
+mobile/web-build/
+npm-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker / runtime data
+storage/
+pgdata/
+ollama-data/
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,27 @@
+@startwbs organigramme
+' Organigramme (macro) de la Trésorerie Générale du Royaume
+skinparam dpi 150
+<style>
+wbsDiagram {
+  node {
+    BackgroundColor #FFFFFF
+    LineColor #333333
+    FontColor #000000
+    FontName SansSerif
+    RoundCorner 4
+    Padding 8
+    Margin 7
+  }
+  arrow { LineColor #333333 }
+  :depth(0) { BackgroundColor #DCDCDC }
+}
+</style>
+* Trésorier Général du Royaume\n(Ministère de l'Économie et des Finances)
+** Direction de la Recherche,\nde la Réglementation et de la\nCoopération Internationale
+** Direction des\nFinances Publiques
+** Direction des\nDépenses du Personnel
+** Direction des\nComptes Publics
+**[#D0D0D0] Direction des Ressources\net du Système d'Information\n(direction du stage)
+** Direction du Contrôle,\nde l'Audit et de l'Inspection
+** Réseau territorial\n(trésoreries, perceptions,\nreceveurs communaux)
+@endwbs

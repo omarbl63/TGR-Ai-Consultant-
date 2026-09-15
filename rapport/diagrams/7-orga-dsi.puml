@@ -1,0 +1,25 @@
+@startwbs orga-dsi
+skinparam dpi 150
+' Zoom : Direction des Ressources et du Système d'Information
+<style>
+wbsDiagram {
+  node {
+    BackgroundColor #FFFFFF
+    LineColor #333333
+    FontColor #000000
+    FontName SansSerif
+    RoundCorner 4
+    Padding 7
+    Margin 6
+    HorizontalAlignment left
+  }
+  arrow { LineColor #333333 }
+  :depth(0) { BackgroundColor #DCDCDC }
+}
+</style>
+* Direction des Ressources\net du Système d'Information
+** Division des\nRessources Humaines\n----\n• Gestion des RH\n• Gestion prévisionnelle des RH\n• Formation\n• Action sociale
+** Division du Budget\net de la Logistique\n----\n• Budget\n• Achats\n• Logistique\n• Gestion du patrimoine
+**[#D0D0D0] Division du\nDéveloppement Informatique\n----\n• Assistance à la maîtrise d'ouvrage\n• Architecture et conception\n• Développement\n• Paramétrage et intégration
+** Division de\nl'Exploitation Informatique\n----\n• Gestion des plateformes\n• Applications et données\n• Réseaux et télécommunications\n• Bureautique\n• Sécurité informatique
+@endwbs

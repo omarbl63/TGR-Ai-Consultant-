@@ -1,0 +1,104 @@
+@startuml cas-utilisation
+' Diagramme de cas d'utilisation — Agent Administratif IA (Trésorerie Générale du Royaume)
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F4F4F4
+  BorderColor #333333
+  ArrowColor #555555
+}
+skinparam actor {
+  BackgroundColor #EAEAEA
+  BorderColor #222222
+}
+title Diagramme de cas d'utilisation — Agent Administratif IA
+
+left to right direction
+
+actor "Employé" as EMP
+actor "Responsable\n(valideur)" as RESP
+actor "Administrateur" as ADMIN
+actor "Assistant IA\n(LLM + RAG)" as IA
+
+RESP --|> EMP
+ADMIN --|> RESP
+
+rectangle "Plateforme — Trésorerie Générale du Royaume" {
+
+  package "Authentification" {
+    usecase "S'authentifier" as UC_AUTH
+    usecase "Créer un compte" as UC_SIGNUP
+    usecase "Se déconnecter" as UC_LOGOUT
+  }
+
+  package "Espace employé (application web progressive)" {
+    usecase "Discuter avec l'assistant IA" as UC_CHAT
+    usecase "Créer une demande\n(congé / mission / frais)" as UC_CREATE
+    usecase "Consulter mon solde de congés" as UC_SOLDE
+    usecase "Suivre mes demandes" as UC_SUIVI
+    usecase "Consulter le détail d'une demande" as UC_DETAIL
+    usecase "Consulter mon profil" as UC_PROFIL
+  }
+
+  package "Espace d'approbation (dashboard)" {
+    usecase "Consulter le tableau de bord" as UC_DASH
+    usecase "Consulter la file des demandes" as UC_FILE
+    usecase "Examiner une demande\net son analyse IA" as UC_EXAM
+    usecase "Approuver / Rejeter /\nDemander des modifications" as UC_DECISION
+    usecase "Interroger l'IA sur une demande" as UC_ASK
+    usecase "Gérer les notifications" as UC_NOTIF
+  }
+
+  package "Administration" {
+    usecase "Consulter l'annuaire des employés" as UC_ANNU
+    usecase "Gérer la base de connaissances\n(réindexer les règlements)" as UC_KB
+    usecase "Consulter le journal d'audit" as UC_AUDIT
+  }
+
+  package "Traitement IA (interne)" {
+    usecase "Détecter l'intention\net extraire les informations" as UC_INTENT
+    usecase "Rechercher les règlements (RAG)" as UC_RAG
+    usecase "Valider la conformité\net expliquer (citations)" as UC_ANALYSE
+  }
+}
+
+' --- Employé ---
+EMP --> UC_AUTH
+EMP --> UC_SIGNUP
+EMP --> UC_LOGOUT
+EMP --> UC_CHAT
+EMP --> UC_SOLDE
+EMP --> UC_SUIVI
+EMP --> UC_DETAIL
+EMP --> UC_PROFIL
+
+' --- Responsable (valideur) ---
+RESP --> UC_DASH
+RESP --> UC_FILE
+RESP --> UC_EXAM
+RESP --> UC_DECISION
+RESP --> UC_ASK
+RESP --> UC_NOTIF
+
+' --- Administrateur ---
+ADMIN --> UC_ANNU
+ADMIN --> UC_KB
+ADMIN --> UC_AUDIT
+
+' --- Relations include / extend ---
+UC_CHAT ..> UC_INTENT : <<include>>
+UC_CHAT ..> UC_CREATE : <<extend>>
+UC_CREATE ..> UC_ANALYSE : <<include>>
+UC_ANALYSE ..> UC_RAG : <<include>>
+UC_ASK ..> UC_RAG : <<include>>
+UC_SOLDE ..> UC_INTENT : <<include>>
+
+' --- Participation de l'IA ---
+IA --> UC_INTENT
+IA --> UC_RAG
+IA --> UC_ANALYSE
+
+@enduml
