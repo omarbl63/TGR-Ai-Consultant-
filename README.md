@@ -1,6 +1,6 @@
 # AdminAI — AI Administrative Agent
 
-> Final Year Engineering Project (PFE). An enterprise platform where employees interact with an **AI agent** in natural language instead of filling administrative forms. The AI understands the request, retrieves internal regulations via **Retrieval-Augmented Generation (RAG)**, validates compliance, drafts the official document, explains its reasoning, and produces a **recommendation for a human approver**. The AI never decides — a manager or director always makes the final call.
+> An enterprise platform where employees interact with an **AI agent** in natural language instead of filling administrative forms. The AI understands the request, retrieves internal regulations via **Retrieval-Augmented Generation (RAG)**, validates compliance, drafts the official document, explains its reasoning, and produces a **recommendation for a human approver**. The AI never decides — a manager or director always makes the final call.
 
 The knowledge base simulates a **Moroccan public administration** (documents in French). It is a simulated dataset created for this project, not official documents of any institution.
 
