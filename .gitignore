@@ -1,6 +1,7 @@
 # Secrets & env
 .env
 *.local
+**/CLAUDE.md
 
 # Java / Maven
 backend/target/
